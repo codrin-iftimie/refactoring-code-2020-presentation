@@ -1,0 +1,34 @@
+{
+  "name": "react-ecosystem-2020-presentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-brands-svg-icons": "^5.15.1",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/react-fontawesome": "^0.1.12",
+    "code-surfer": "^3.1.1",
+    "gooey-react": "^1.1.0",
+    "mdx-code": "^2.0.0",
+    "mdx-deck": "^4.1.1",
+    "react": "^17.0.1",
+    "styled-components": "^5.2.1"
+  },
+  "devDependencies": {
+    "mdx-deck-live-code": "^1.0.1"
+  },
+  "scripts": {
+    "start": "mdx-deck src/index.mdx"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codrin-iftimie/react-ecosystem-2020-presentation.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codrin-iftimie/react-ecosystem-2020-presentation/issues"
+  },
+  "homepage": "https://github.com/codrin-iftimie/react-ecosystem-2020-presentation#readme"
+}

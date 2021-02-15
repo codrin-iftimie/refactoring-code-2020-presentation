@@ -1,0 +1,427 @@
+import { themes, Notes } from "mdx-deck";
+import { LiveCode } from "mdx-deck-live-code";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Code from "mdx-code";
+import { CodeSurfer } from "code-surfer"
+import matrixTheme from "./styles/theme";
+export const theme = matrixTheme;
+
+import prettier from './assets/prettier.png'
+
+# Refactor your code
+
+ - When
+ - Where
+ - How
+
+
+## Resources
+
+ - https://refactoring.guru/refactoring/catalog
+ - https://refactoring.guru/design-patterns/catalog
+
+
+---
+
+# When to
+
+ - Early code reviews are a good way to improve your code
+ - After taking a break, we might have better ideas on how to approach a problem
+ - when there is nothing else to do on the project
+
+# When not to
+
+ - before a release
+ - when there are no tests for that code
+
+---
+
+# Where to start
+
+ - code that has a limited impact that can be isolated
+ - a new feature that is part of a secondary flow
+ - utility functions with simple inputs and outputs
+ - prepare the ground for a incoming feature
+
+# Where to continue
+
+ - Code with a high impact should be refactored in stages (plan, test, execute)
+ - Architectural changes should be accompanied with documentation and deprecations
+
+---
+
+# How
+
+<iframe src="https://giphy.com/embed/H6JdkRnhXQaImiCYp2" width="480" height="253" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+
+ - hard to start with
+ - gets better in time
+
+---
+
+# Set an objective
+
+ - Analize the specific piece of code, document it's impact (dependents)
+ - Plan objectives to improve readability, performance or usability
+ - Prepare for the future
+ - Idealy, write tests first
+ - Execute the plan and document the changes, if any
+
+---
+
+# Code readability
+
+80% of our time as developers we spend reading code. Code readability is esential.
+Have prettier, linting tools, and guides prepared to ensure code consistency
+
+<img src={prettier} />
+
+---
+
+# Switch cases
+
+<CodeSurfer>
+
+```js 2:7
+function appReducer(state = initialState, action) {
+  switch (action.type) {
+    case 'SET_VISIBILITY_FILTER': {
+      return Object.assign({}, state, {
+        visibilityFilter: action.filter
+      })
+    }
+    case 'ADD_TODO': {
+      return Object.assign({}, state, {
+        todos: state.todos.concat({
+          id: action.id,
+          text: action.text,
+          completed: false
+        })
+      })
+    }
+    case 'TOGGLE_TODO': {
+      return Object.assign({}, state, {
+        todos: state.todos.map(todo => {
+          if (todo.id !== action.id) {
+            return todo
+          }
+
+          return Object.assign({}, todo, {
+            completed: !todo.completed
+          })
+        })
+      })
+    }
+    case 'EDIT_TODO': {
+      return Object.assign({}, state, {
+        todos: state.todos.map(todo => {
+          if (todo.id !== action.id) {
+            return todo
+          }
+
+          return Object.assign({}, todo, {
+            text: action.text
+          })
+        })
+      })
+    }
+    default:
+      return state
+  }
+}
+```
+
+```js 8:16
+function appReducer(state = initialState, action) {
+  switch (action.type) {
+    case 'SET_VISIBILITY_FILTER': {
+      return Object.assign({}, state, {
+        visibilityFilter: action.filter
+      })
+    }
+    case 'ADD_TODO': {
+      return Object.assign({}, state, {
+        todos: state.todos.concat({
+          id: action.id,
+          text: action.text,
+          completed: false
+        })
+      })
+    }
+    case 'TOGGLE_TODO': {
+      return Object.assign({}, state, {
+        todos: state.todos.map(todo => {
+          if (todo.id !== action.id) {
+            return todo
+          }
+
+          return Object.assign({}, todo, {
+            completed: !todo.completed
+          })
+        })
+      })
+    }
+    case 'EDIT_TODO': {
+      return Object.assign({}, state, {
+        todos: state.todos.map(todo => {
+          if (todo.id !== action.id) {
+            return todo
+          }
+
+          return Object.assign({}, todo, {
+            text: action.text
+          })
+        })
+      })
+    }
+    default:
+      return state
+  }
+}
+```
+
+</CodeSurfer>
+
+---
+
+# Solution
+
+<CodeSurfer>
+
+```js 1:10
+function createReducer(initialState, handlers) {
+  return function reducer(state = initialState, action) {
+    if (handlers.hasOwnProperty(action.type)) {
+      return handlers[action.type](state, action)
+    } else {
+      return state
+    }
+  }
+}
+
+function addTodo(todosState, action) {}
+function toggleTodo(todosState, action) {}
+function editTodo(todosState, action) {}
+
+const todosReducer = createReducer([], {
+  ADD_TODO: addTodo,
+  TOGGLE_TODO: toggleTodo,
+  EDIT_TODO: editTodo
+})
+```
+
+```js 11:14
+function createReducer(initialState, handlers) {
+  return function reducer(state = initialState, action) {
+    if (handlers.hasOwnProperty(action.type)) {
+      return handlers[action.type](state, action)
+    } else {
+      return state
+    }
+  }
+}
+
+function addTodo(todosState, action) {}
+function toggleTodo(todosState, action) {}
+function editTodo(todosState, action) {}
+
+const todosReducer = createReducer([], {
+  ADD_TODO: addTodo,
+  TOGGLE_TODO: toggleTodo,
+  EDIT_TODO: editTodo
+})
+```
+
+```js 15:21
+function createReducer(initialState, handlers) {
+  return function reducer(state = initialState, action) {
+    if (handlers.hasOwnProperty(action.type)) {
+      return handlers[action.type](state, action)
+    } else {
+      return state
+    }
+  }
+}
+
+function addTodo(todosState, action) {}
+function toggleTodo(todosState, action) {}
+function editTodo(todosState, action) {}
+
+const todosReducer = createReducer([], {
+  ADD_TODO: addTodo,
+  TOGGLE_TODO: toggleTodo,
+  EDIT_TODO: editTodo
+})
+```
+
+</CodeSurfer>
+
+---
+
+# If statements
+
+<CodeSurfer>
+
+```js 5:15
+render() {
+  const personToLookFor = 'Thierry'
+  const [result, loading] = doesPersonExists(personToLookFor)
+
+  if (!loading) {
+    let message
+    if (result) {
+      message = `${personToLookFor} already exists.`
+    } else {
+      message = `${personToLookFor} doesn't exist.`
+    }
+    return message
+  } else {
+    return 'Loading...'
+  }
+}
+```
+</CodeSurfer>
+
+---
+
+# Solution
+
+<CodeSurfer>
+
+```js 4:10
+render() {
+  const personToLookFor = 'Thierry'
+  const [result, loading] = doesPersonExists(personToLookFor)
+
+  if (loading) return 'Loading...'
+
+  if (result) {
+    return `${personToLookFor} already exists.`
+  }
+  return `${personToLookFor} doesn't exist.`
+}
+```
+
+</CodeSurfer>
+
+---
+
+# Pattern matching
+
+<CodeSurfer>
+
+```js 2:8
+render({cloudType, env, applicationType}) {
+  if (env === "development") {
+    if (["google", "aws", "azure"]) {
+      return <CloudDetails cloudType={cloudType} />
+    }
+
+    return <SomethingElse1 />
+  }
+
+  if (env === "production") {
+    if (["saas", "quickstart"].includes(applicationType)) {
+      return <CloudDetails cloudType={cloudType} />
+    }
+
+    if (cloudType === "vmware") {
+      return <CloudDetails cloudType={cloudType} />
+    }
+
+    return <SomethingElse2 />
+  }
+}
+```
+
+```js 9:20
+render({cloudType, env, applicationType}) {
+  if (env === "development") {
+    if (["google", "aws", "azure"]) {
+      return <CloudDetails cloudType={cloudType} />
+    }
+
+    return <SomethingElse1 />
+  }
+
+  if (env === "production") {
+    if (["saas", "quickstart"].includes(applicationType)) {
+      return <CloudDetails cloudType={cloudType} />
+    }
+
+    if (cloudType === "vmware") {
+      return <CloudDetails cloudType={cloudType} />
+    }
+
+    return <SomethingElse2 />
+  }
+}
+```
+</CodeSurfer>
+
+---
+
+# Solution
+
+<CodeSurfer>
+
+```js 5:8,11:12
+const { matches } = require('z')
+
+render({cloudType, env, applicationType}) {
+  matches([cloudType, env])(
+    (["google", "development"]) => <CloudDetails cloudType={cloudType} />,
+    (["aws", "development"]) => <CloudDetails cloudType={cloudType} />,
+    (["azure", "development"]) => <CloudDetails cloudType={cloudType} />,
+    (["vmware", "production"]) => <CloudDetails cloudType={cloudType} />,
+  );
+  matches([cloudType, applicationType])(
+    (["production", "saas"]) => <CloudDetails cloudType={cloudType} />,
+    (["production", "quickstart"]) => <CloudDetails cloudType={cloudType} />,
+  )
+}
+```
+
+</CodeSurfer>
+
+---
+
+# Functions
+
+A function should improve the reausability of the specific code, as long as it's concern ca be named in some way without
+describing what the function does. In some cases it can even improve readability.
+
+Use ES6 features when there too many variables or you want named parameters and/or default values
+
+---
+
+# Classes
+
+Modules of code that are used and need their own isolation. Are easier to read than a function that returns an object.
+I wouldn't go too far with OOP, but we should apply what SOLID teaches us. <br />
+Since they are isolated / instanciated it becomes easier to test
+
+## Design patterns
+
+Applying KISS and not overloading your code with design patterns might make it easy for anyone to pick up any feature.
+Keep the interface as simple as possible.
+If something is complex, documenting how it works will make it accesible to onboarding new developers on the project
+
+---
+
+# Concerns
+
+Try to separate different modules or layers of your application. For example views should only render from properties. To maitain consistency,
+even constants should be defined as properties. You will never know when that constant will become something that prevents you from reusing that
+component.
+
+Keep logic outside of the view layer. Eg: clicking a button does 2 things: opens an modal and fetches some data; instead have only one property
+to define how that action is handled.
+
+Have only one way to communicate with different services (modals, notifications etc). Use Redux or something that is similar to organize your code.
+Understand what are actions and what are side-effects of that action. Eg: clicking a link, action, will open the page.
+Data that is needed by that page should be requested as route is changed; this is a side-effect. These rules keep your layers decoupled and your code
+more flexible.
+
+Add `TODO`s when you move away from what is considered the norm. These are oportunities to set new rules or have architectural improvements.
+Don't rush adding a "rule" too early. In time you will see bad patterns that occur that end up with messy code.
